@@ -1,0 +1,26 @@
+[
+  {
+    "role": "user",
+    "content": "Hello"
+  },
+  {
+    "role": "assistant",
+    "content": "Hello! How can I help you today?\n"
+  },
+  {
+    "role": "user",
+    "content": "do you use gemini"
+  },
+  {
+    "role": "assistant",
+    "content": "As a large language model, I am developed in Google. While I share similarities with Gemini models (like being trained on a massive dataset of text and code), I'm not *specifically* Gemini. Think of it this way: Gemini is a specific family of models, and I'm built using Google's underlying large language model research and infrastructure, which also powers Gemini.\n"
+  },
+  {
+    "role": "user",
+    "content": "2+2"
+  },
+  {
+    "role": "assistant",
+    "content": "2 + 2 = 4\n"
+  }
+]
