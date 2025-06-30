@@ -6,15 +6,15 @@ from tools.meal_planner import MealPlannerTool
 from tools.workout_recommender import WorkoutRecommenderTool
 from tools.scheduler import CheckinSchedulerTool
 from tools.tracker import ProgressTrackerTool
-from agents.nutrition_expert_agent import NutritionExpertAgent
-from agents.injury_support_agent import InjurySupportAgent
-from agents.escalation_agent import EscalationAgent
+from agents.nutrition_expert import NutritionExpertAgent
+from agents.injury_support import InjurySupportAgent
+from agents.escalation import EscalationAgent
 from guardrails import validate_goal_input, validate_dietary_input
 from pydantic import BaseModel
 import uuid
 
 # Set up Gemini API client
-gemini_api_key = ""  # Add your Gemini API key here
+gemini_api_key = "REDACTED"  # Add your Gemini API key here
 set_tracing_disabled(True)
 set_default_openai_api("chat_completions")
 external_client = AsyncOpenAI(
