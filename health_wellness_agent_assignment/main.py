@@ -6,15 +6,15 @@ from tools.meal_planner import MealPlannerTool
 from tools.workout_recommender import WorkoutRecommenderTool
 from tools.scheduler import CheckinSchedulerTool
 from tools.tracker import ProgressTrackerTool
-from agents.nutrition_expert import NutritionExpertAgent
-from agents.injury_support import InjurySupportAgent
-from agents.escalation import EscalationAgent
+from all.nutrition_expert import NutritionExpertAgent
+from all.injury_support import InjurySupportAgent
+from all.escalation import EscalationAgent
 from guardrails import validate_goal_input, validate_dietary_input
 from pydantic import BaseModel
 import uuid
 
 # Set up Gemini API client
-gemini_api_key = "REDACTED"  # Add your Gemini API key here
+gemini_api_key = ""  # Replace with your actual Gemini API key
 set_tracing_disabled(True)
 set_default_openai_api("chat_completions")
 external_client = AsyncOpenAI(
@@ -66,14 +66,16 @@ async def main():
                 print("Invalid dietary input. Please specify valid dietary preferences.")
                 continue
 
-        # Stream the response
-        async for step in Runner.stream(
-            starting_agent=main_agent,
-            input=user_input,
-            context=user_context
-        ):
-            print(step.pretty_output, end="", flush=True)
-        print("\n")
+        # Execute the agent
+        try:
+            result = await Runner.run(
+                starting_agent=main_agent,
+                input=user_input,
+                context=user_context
+            )
+            print(result.final_output if result.final_output else "No response generated.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     asyncio.run(main())

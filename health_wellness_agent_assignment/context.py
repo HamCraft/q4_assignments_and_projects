@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List, Dict
+from typing import List, Dict, Optional
 
 class UserSessionContext(BaseModel):
     name: str
@@ -7,7 +7,6 @@ class UserSessionContext(BaseModel):
     goal: Optional[dict] = None
     diet_preferences: Optional[str] = None
     workout_plan: Optional[dict] = None
-    meal_plan: Optional[List[str]] = None
     injury_notes: Optional[str] = None
-    handoff_logs: List[str] = []
     progress_logs: List[Dict[str, str]] = []
+    handoff_logs: List[str] = []

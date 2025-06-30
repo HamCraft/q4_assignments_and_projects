@@ -1,11 +1,21 @@
-# tools/meal_planner.py (optional improvement)
 from agents.tool import FunctionTool
 from context import UserSessionContext
 from typing import List
 
 class MealPlannerTool(FunctionTool):
-    name = "MealPlannerTool"
-    description = "Generates a 7-day meal plan based on dietary preferences"
+    def __init__(self):
+        super().__init__(
+            name="MealPlannerTool",
+            description="Generates a 7-day meal plan based on dietary preferences",
+            params_json_schema={
+                "type": "object",
+                "properties": {
+                    "input": {"type": "string", "description": "Dietary preference input"}
+                },
+                "required": ["input"]
+            },
+            on_invoke_tool=self.execute
+        )
 
     async def execute(self, input: str, context: UserSessionContext) -> List[str]:
         valid_diets = ["vegetarian", "vegan", "diabetic", "gluten-free"]
