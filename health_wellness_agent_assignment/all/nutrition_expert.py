@@ -9,6 +9,9 @@ class NutritionExpertAgent(Agent):
             model="gemini-2.0-flash"
         )
 
-    async def on_handoff(self, input: str, context: UserSessionContext):
-        context.handoff_logs.append(f"Handed off to NutritionExpertAgent: {input}")
-        return f"Nutrition expert handling: {input}"
+    async def on_handoff(self, input: str, context: UserSessionContext) -> str:
+        try:
+            context.handoff_logs.append(f"Handed off to NutritionExpertAgent: {input}")
+            return f"Nutrition expert handling: {input}"
+        except Exception as e:
+            return f"Error in NutritionExpertAgent: {str(e)}"

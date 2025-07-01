@@ -9,6 +9,9 @@ class EscalationAgent(Agent):
             model="gemini-2.0-flash"
         )
 
-    async def on_handoff(self, input: str, context: UserSessionContext):
-        context.handoff_logs.append(f"Handed off to EscalationAgent: {input}")
-        return "Connecting you to a human coach."
+    async def on_handoff(self, input: str, context: UserSessionContext) -> str:
+        try:
+            context.handoff_logs.append(f"Handed off to EscalationAgent: {input}")
+            return "Connecting you to a human coach."
+        except Exception as e:
+            return f"Error in EscalationAgent: {str(e)}"

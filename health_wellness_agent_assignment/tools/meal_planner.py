@@ -18,10 +18,14 @@ class MealPlannerTool(FunctionTool):
         )
 
     async def execute(self, input: str, context: UserSessionContext) -> List[str]:
-        valid_diets = ["vegetarian", "vegan", "diabetic", "gluten-free"]
-        if any(diet in input.lower() for diet in valid_diets):
-            context.diet_preferences = input.lower()
-        diet = context.diet_preferences or "standard"
-        meals = [f"Day {i+1}: {diet} meal - Sample dish" for i in range(7)]
-        context.meal_plan = meals
-        return meals
+        try:
+            valid_diets = ["vegetarian", "vegan", "diabetic", "gluten-free"]
+            input_lower = input.lower()
+            if any(diet in input_lower for diet in valid_diets):
+                context.diet_preferences = input_lower
+            diet = context.diet_preferences or "standard"
+            meals = [f"Day {i+1}: {diet} meal - Sample dish" for i in range(7)]
+            context.meal_plan = meals
+            return meals
+        except Exception as e:
+            return [f"Error in MealPlannerTool: {str(e)}"]

@@ -12,9 +12,15 @@ from all.escalation import EscalationAgent
 from guardrails import validate_goal_input, validate_dietary_input
 from pydantic import BaseModel
 import uuid
+from dotenv import load_dotenv
+import os
 
-# Set up Gemini API client
-gemini_api_key = ""  # Replace with your actual Gemini API key
+load_dotenv()
+
+gemini_api_key = os.getenv("gemini_api_key")
+
+
+# Set up Gemini API client # Replace with your actual Gemini API key
 set_tracing_disabled(True)
 set_default_openai_api("chat_completions")
 external_client = AsyncOpenAI(
@@ -26,7 +32,20 @@ set_default_openai_client(external_client)
 # Define main agent
 main_agent = Agent(
     name="HealthWellnessAgent",
-    instructions="You are a Health & Wellness Planner Agent. Help users set health goals, create meal and workout plans, and track progress. Use tools to analyze goals, suggest plans, and schedule check-ins. Handoff to specialized agents for complex needs.",
+    instructions="""
+        You are a friendly Health & Wellness Assistant. Help users with:
+        - Setting and analyzing fitness goals
+        - Creating meal plans based on dietary preferences
+        - Recommending workout routines
+        - Tracking progress and scheduling check-ins
+        - Do NOT concatenate tool names or call multiple tools in a single call.
+        - Format tool calls clearly and separately.
+        When users ask for meal plans, workout routines, or goal analysis, USE THE APPROPRIATE TOOLS IMMEDIATELY to provide helpful content.
+        Tools have default parameters, so use them even if the user doesn't specify all details.
+        ALWAYS INCLUDE THE COMPLETE TOOL RESULTS IN YOUR RESPONSE - don't just say 'I've created a plan', show the actual plan details.
+        Be encouraging and supportive. Provide immediate value first, then ask follow-up questions for improvements.
+        If users mention injuries, complex dietary needs, or want human support, use handoffs.
+        """,
     model="gemini-2.0-flash",
     tools=[
         GoalAnalyzerTool(),

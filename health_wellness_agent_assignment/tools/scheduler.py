@@ -17,4 +17,7 @@ class CheckinSchedulerTool(FunctionTool):
         )
 
     async def execute(self, input: str, context: UserSessionContext) -> str:
-        return "Weekly check-in scheduled for every Monday."
+        try:
+            return "Weekly check-in scheduled for every Monday."
+        except Exception as e:
+            return f"Error in CheckinSchedulerTool: {str(e)}"

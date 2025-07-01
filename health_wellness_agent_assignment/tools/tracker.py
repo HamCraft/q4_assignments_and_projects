@@ -18,6 +18,9 @@ class ProgressTrackerTool(FunctionTool):
         )
 
     async def execute(self, input: str, context: UserSessionContext) -> Dict[str, str]:
-        progress = {"date": "2025-06-30", "update": input}
-        context.progress_logs.append(progress)
-        return progress
+        try:
+            progress = {"date": "2025-06-30", "update": input}
+            context.progress_logs.append(progress)
+            return progress
+        except Exception as e:
+            return {"error": f"Error in ProgressTrackerTool: {str(e)}"}

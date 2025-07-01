@@ -17,6 +17,9 @@ class WorkoutRecommenderTool(FunctionTool):
         )
 
     async def execute(self, input: str, context: UserSessionContext) -> dict:
-        plan = {"days": ["Monday: Cardio", "Wednesday: Strength", "Friday: Yoga"]}
-        context.workout_plan = plan
-        return plan
+        try:
+            plan = {"days": ["Monday: Cardio", "Wednesday: Strength", "Friday: Yoga"]}
+            context.workout_plan = plan
+            return plan
+        except Exception as e:
+            return {"error": f"Error in WorkoutRecommenderTool: {str(e)}"}
