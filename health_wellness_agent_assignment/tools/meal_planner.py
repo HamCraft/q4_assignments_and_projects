@@ -1,31 +1,20 @@
-from agents.tool import FunctionTool
-from context import UserSessionContext
-from typing import List
+from agents import function_tool
+from guardrails import validate_dietary_input, validate_meal_plan_output
+import asyncio
 
-class MealPlannerTool(FunctionTool):
-    def __init__(self):
-        super().__init__(
-            name="MealPlannerTool",
-            description="Generates a 7-day meal plan based on dietary preferences",
-            params_json_schema={
-                "type": "object",
-                "properties": {
-                    "input": {"type": "string", "description": "Dietary preference input"}
-                },
-                "required": ["input"]
-            },
-            on_invoke_tool=self.execute
-        )
+@function_tool
+async def meal_planner(diet_preferences: str) -> dict:
+    """Generates a 7-day meal plan based on dietary preferences.
 
-    async def execute(self, input: str, context: UserSessionContext) -> List[str]:
-        try:
-            valid_diets = ["vegetarian", "vegan", "diabetic", "gluten-free"]
-            input_lower = input.lower()
-            if any(diet in input_lower for diet in valid_diets):
-                context.diet_preferences = input_lower
-            diet = context.diet_preferences or "standard"
-            meals = [f"Day {i+1}: {diet} meal - Sample dish" for i in range(7)]
-            context.meal_plan = meals
-            return meals
-        except Exception as e:
-            return [f"Error in MealPlannerTool: {str(e)}"]
+    Args:
+        diet_preferences: The user's dietary preferences (e.g., 'vegetarian', 'vegan').
+
+    Returns:
+        A dictionary with a list of meal suggestions for 7 days.
+    """
+    if not validate_dietary_input(diet_preferences):
+        raise ValueError("Invalid dietary preference. Use: 'vegetarian', 'vegan', 'keto', 'gluten-free', or 'diabetic'")
+    # Simulate async operation (replace with API call or model-based generation)
+    await asyncio.sleep(1)
+    meals = [f"{diet_preferences.capitalize()} Meal {i+1}" for i in range(7)]
+    return validate_meal_plan_output({"meals": meals}).dict()

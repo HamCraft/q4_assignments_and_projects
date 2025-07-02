@@ -1,23 +1,16 @@
-from agents.tool import FunctionTool
-from context import UserSessionContext
+from agents import function_tool
+from guardrails import validate_schedule_output
 
-class CheckinSchedulerTool(FunctionTool):
-    def __init__(self):
-        super().__init__(
-            name="CheckinSchedulerTool",
-            description="Schedules weekly progress check-ins",
-            params_json_schema={
-                "type": "object",
-                "properties": {
-                    "input": {"type": "string", "description": "Scheduling input"}
-                },
-                "required": ["input"]
-            },
-            on_invoke_tool=self.execute
-        )
+@function_tool
+def checkin_scheduler(input_data: dict) -> dict:
+    """Schedules recurring weekly progress checks.
 
-    async def execute(self, input: str, context: UserSessionContext) -> str:
-        try:
-            return "Weekly check-in scheduled for every Monday."
-        except Exception as e:
-            return f"Error in CheckinSchedulerTool: {str(e)}"
+    Args:
+        input_data: A dictionary with scheduling preferences (currently unused).
+
+    Returns:
+        A dictionary with scheduled check-in times.
+    """
+    # Mock implementation
+    checkins = ["Monday 8 AM", "Thursday 8 AM"]
+    return validate_schedule_output({"checkins": checkins}).dict()

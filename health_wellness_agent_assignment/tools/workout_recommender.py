@@ -1,25 +1,20 @@
-from agents.tool import FunctionTool
-from context import UserSessionContext
+from agents import function_tool
+from guardrails import Goal, validate_workout_plan_output
 
-class WorkoutRecommenderTool(FunctionTool):
-    def __init__(self):
-        super().__init__(
-            name="WorkoutRecommenderTool",
-            description="Suggests a weekly workout plan based on user goals",
-            params_json_schema={
-                "type": "object",
-                "properties": {
-                    "input": {"type": "string", "description": "Workout goal input"}
-                },
-                "required": ["input"]
-            },
-            on_invoke_tool=self.execute
-        )
+@function_tool
+def workout_recommender(goal: Goal) -> dict:
+    """Suggests a workout plan based on parsed goals and experience.
 
-    async def execute(self, input: str, context: UserSessionContext) -> dict:
-        try:
-            plan = {"days": ["Monday: Cardio", "Wednesday: Strength", "Friday: Yoga"]}
-            context.workout_plan = plan
-            return plan
-        except Exception as e:
-            return {"error": f"Error in WorkoutRecommenderTool: {str(e)}"}
+    Args:
+        goal: A Goal model containing the parsed goal (e.g., {'action': 'lose', 'quantity': 5, 'metric': 'kg'}).
+
+    Returns:
+        A dictionary with the workout plan.
+    """
+    # Mock implementation (replace with model-based generation)
+    exercises = {
+        "Monday": "Strength Training",
+        "Wednesday": "Cardio",
+        "Friday": "Yoga"
+    }
+    return validate_workout_plan_output({"exercises": exercises}).dict()

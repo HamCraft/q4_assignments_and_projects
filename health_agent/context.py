@@ -1,13 +1,15 @@
+from pydantic import BaseModel, ConfigDict
 from typing import Optional, List, Dict
-from pydantic import BaseModel
 
 class UserSessionContext(BaseModel):
     name: str
     uid: int
-    goal: Optional[Dict] = None
+    goal: Optional[dict] = None
     diet_preferences: Optional[str] = None
-    workout_plan: Optional[Dict] = None
+    workout_plan: Optional[dict] = None
     meal_plan: Optional[List[str]] = None
     injury_notes: Optional[str] = None
     handoff_logs: List[str] = []
     progress_logs: List[Dict[str, str]] = []
+
+    model_config = ConfigDict(extra='forbid') 

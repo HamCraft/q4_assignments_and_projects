@@ -1,31 +1,23 @@
-from agents.tool import FunctionTool
-from context import UserSessionContext
+from agents import function_tool
+from guardrails import validate_goal_input, validate_goal_output
 
-class GoalAnalyzerTool(FunctionTool):
-    def __init__(self):
-        super().__init__(
-            name="GoalAnalyzerTool",
-            description="Analyzes user goals and converts them into structured format",
-            params_json_schema={
-                "type": "object",
-                "properties": {
-                    "input": {"type": "string", "description": "User goal input"}
-                },
-                "required": ["input"]
-            },
-            on_invoke_tool=self.execute
-        )
+@function_tool
+def goal_analyzer(input_data: str) -> dict:
+    """Analyzes user's fitness goal and extracts structured information.
 
-    async def execute(self, input: str, context: UserSessionContext) -> dict:
-        try:
-            # Simple parsing for demo purposes
-            input_lower = input.lower()
-            parts = input_lower.split()
-            quantity = next((word for word in parts if word.isdigit()), "5")
-            metric = "kg" if "kg" in input_lower else "lbs"
-            duration = next((parts[i + 1] for i, word in enumerate(parts) if word == "in"), "2 months")
-            goal = {"quantity": int(quantity), "metric": metric, "duration": duration}
-            context.goal = goal
-            return goal
-        except Exception as e:
-            return {"error": f"Failed to analyze goal: {str(e)}"}
+    Args:
+        input_data: The user's goal statement (e.g., 'lose 5kg in 2 months').
+
+    Returns:
+        A dictionary with the structured goal.
+    """
+    if not validate_goal_input(input_data):
+        raise ValueError("Invalid goal format. Use: '[lose/gain] [number] [kg/lbs] in [number] [months/weeks]'")
+    parts = input_data.lower().split()
+    goal = {
+        "action": parts[0],
+        "quantity": float(parts[1]),
+        "metric": parts[2],
+        "duration": " ".join(parts[4:]) if len(parts) > 4 else None
+    }
+    return validate_goal_output(goal).dict()

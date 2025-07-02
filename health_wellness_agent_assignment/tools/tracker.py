@@ -1,26 +1,14 @@
-from agents.tool import FunctionTool
-from context import UserSessionContext
-from typing import Dict
+from agents import function_tool
+from guardrails import validate_progress_update_output
 
-class ProgressTrackerTool(FunctionTool):
-    def __init__(self):
-        super().__init__(
-            name="ProgressTrackerTool",
-            description="Tracks user progress and updates context",
-            params_json_schema={
-                "type": "object",
-                "properties": {
-                    "input": {"type": "string", "description": "Progress update input"}
-                },
-                "required": ["input"]
-            },
-            on_invoke_tool=self.execute
-        )
+@function_tool
+def progress_tracker(update: dict) -> dict:
+    """Tracks user progress and updates session context.
 
-    async def execute(self, input: str, context: UserSessionContext) -> Dict[str, str]:
-        try:
-            progress = {"date": "2025-06-30", "update": input}
-            context.progress_logs.append(progress)
-            return progress
-        except Exception as e:
-            return {"error": f"Error in ProgressTrackerTool: {str(e)}"}
+    Args:
+        update: A dictionary with progress updates (e.g., {'weight': '70kg', 'date': '2025-07-01'}).
+
+    Returns:
+        A dictionary with the progress update.
+    """
+    return validate_progress_update_output({"update": update}).dict()
