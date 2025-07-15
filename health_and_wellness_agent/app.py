@@ -55,6 +55,6 @@ async def chat_with_agent(user_query: UserQuery):
     )
 
 
-@app.get("/api")
+@app.get("/")
 def home():
     return {"status": "Health and Wellness Agent API is running!"}
