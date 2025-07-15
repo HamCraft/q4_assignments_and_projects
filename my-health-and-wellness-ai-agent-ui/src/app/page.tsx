@@ -20,7 +20,7 @@ export default function Home() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const apiUrl = "https://q4-assignments-and-projects-k9b3.vercel.app"
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL 
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -139,10 +139,10 @@ export default function Home() {
               <p className="text-gray-600 mb-6">Ask me anything about health, nutrition, fitness, or wellness!</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl mx-auto">
                 {[
-                  "What are some healthy breakfast ideas?",
-                  "How can I improve my sleep quality?",
-                  "What exercises are good for back pain?",
-                  "How much water should I drink daily?",
+                  "create a balanced meal plan",
+                  "I have diabetes, what should I eat?",
+                  "What exercises are good for spine injury?",
+                  "analyze my goals and suggest a routine",
                 ].map((suggestion, index) => (
                   <button
                     key={index}
