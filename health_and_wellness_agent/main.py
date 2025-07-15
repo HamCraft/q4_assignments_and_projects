@@ -15,6 +15,7 @@ from tools.meal_planner import suggest_meal_plan
 from tools.workout_recommender import recommend_workouts
 from tools.tracker import progress_tracker
 from tools.schedule import smart_workout_scheduler
+from agent import agent as health_and_wellness_agent
 
 
 # Load environment variables from .env file / OpenAI Agents SDK Setup
@@ -41,25 +42,7 @@ async def main():
     progress_logs=[]
 )    
 
-    # Main Agent
-    agent = Agent[UserSessionContext](
-        name="Health & Wellness Agent",
-        instructions="You are a friendly Health & Wellness Assistant. " 
-        "Support users by helping them set and analyze fitness goals, " 
-        "create personalized meal plans based on dietary preferences, " 
-        "recommend appropriate workout routines, track their progress, "
-        "and schedule check-ins. Never concatenate tool names or call multiple tools in a single request. " 
-        "Ensure each tool call is clearly formatted and handled separately."
-,
-        model=OpenAIChatCompletionsModel(model="gemini-2.0-flash", openai_client=client),
-        tools=[analyze_goals, suggest_meal_plan, recommend_workouts, progress_tracker, smart_workout_scheduler],
-        handoffs=[handoff(EscalationAgent, on_handoff=on_escalation_handoff),
-                  handoff(NutritionExpertAgent, on_handoff=on_nutrition_Expert_handoff),
-                 handoff(InjurySupportAgent, on_handoff=on_injury_support_handoff)],
-        input_guardrails=[input_detection_guardrail],
-        output_guardrails=[output_detection_guardrail],
-        
-    )
+    
 
     while True:
         user_input = input("Enter your request (or type 'quit' to exit): ").strip()
@@ -69,7 +52,7 @@ async def main():
         elif user_input == "":
             print("Please enter a request or type 'quit' to exit.")
             continue
-        result = Runner.run_streamed(agent, input=user_input, context=session_context)
+        result = Runner.run_streamed(health_and_wellness_agent, input=user_input, context=session_context)
         try:
             async for event in result.stream_events():
                 if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
@@ -78,10 +61,9 @@ async def main():
             print("❌ Input rejected by guardrail, please try again with a valid input.")
         except OutputGuardrailTripwireTriggered:
             print("⚠️ Output blocked by guardrail, please try again with a valid output.")
-  
-
-
-
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+
+    
