@@ -20,7 +20,7 @@ export default function Home() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL
+  const apiUrl = "https://q4-assignments-and-projects-k9b3.vercel.app"
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
