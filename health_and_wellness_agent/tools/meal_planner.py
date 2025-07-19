@@ -1,25 +1,31 @@
 from agents import function_tool, RunContextWrapper
-from context import UserSessionContext  
-from typing import List
-import random
-
+from context import UserSessionContext
 
 @function_tool
-async def suggest_meal_plan(ctx: RunContextWrapper[UserSessionContext]) -> List[str]:
-    prefs = ctx.context.dietary_preferences or []
-    print("Generating smarter 7 day meal plan...")
-
-    base_meals = {
-        "vegetarian": ["Lentil curry", "Veggie stir-fry", "Tofu salad"],
-        "high_protein": ["Grilled chicken", "Protein smoothie", "Greek yogurt bowl"],
-        "low_carb": ["Zucchini noodles", "Cauliflower rice", "Egg muffins"],
+async def meal_planner(wrapper: RunContextWrapper[UserSessionContext]) -> list[dict]:
+    """
+    Create a 3-meal plan: breakfast, lunch, dinner, adapting to preferences.
+    """
+    prefs = {p.lower() for p in wrapper.context.dietary_preferences}
+    # Sample meal database
+    meals = {
+        'vegetarian': ['Veggie omelette', 'Quinoa salad', 'Stir-fried tofu with veggies'],
+        'vegan': ['Smoothie bowl', 'Lentil soup', 'Chickpea curry with rice'],
+        'keto': ['Egg and avocado plate', 'Grilled salmon with greens', 'Zucchini noodles with pesto'],
+        'default': ['Oatmeal with fruits', 'Grilled chicken salad', 'Steamed vegetables with rice']
     }
 
-    chosen = []
-    for i in range(7):
-        meal = []
-        for pref in prefs:
-            if pref in base_meals:
-                meal.append(random.choice(base_meals[pref]))
-        chosen.append(f"Day {i+1}: {', '.join(meal) or 'Grilled salmon & veggies'}")
-    return chosen
+    # Choose meal set based on first matching preference
+    for key in meals:
+        if key in prefs:
+            selected = meals[key]
+            break
+    else:
+        selected = meals['default']
+
+    plan = [
+        {'meal': 'Breakfast', 'menu': selected[0]},
+        {'meal': 'Lunch', 'menu': selected[1]},
+        {'meal': 'Dinner', 'menu': selected[2]}
+    ]
+    return plan

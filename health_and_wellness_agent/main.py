@@ -1,20 +1,10 @@
 import asyncio
 from openai import AsyncOpenAI
-from agents import Agent, OpenAIChatCompletionsModel, Runner, handoff, set_tracing_disabled, RunContextWrapper, GuardrailFunctionOutput, TResponseInputItem, input_guardrail, InputGuardrailTripwireTriggered, GuardrailFunctionOutput, OutputGuardrailTripwireTriggered, output_guardrail
+from agents import Runner, handoff, set_tracing_disabled,  InputGuardrailTripwireTriggered,  OutputGuardrailTripwireTriggered
 from openai.types.responses import ResponseTextDeltaEvent
 from dotenv import load_dotenv
 import os
-from pydantic import BaseModel
-from context import UserSessionContext
-from custom_agents.escalation_agent import EscalationAgent, on_escalation_handoff
-from custom_agents.injury_support_agent import InjurySupportAgent, on_injury_support_handoff
-from custom_agents.nutrition_expert_agent import NutritionExpertAgent, on_nutrition_Expert_handoff
-from guardrails import input_detection_guardrail, output_detection_guardrail
-from tools.goal_analyzer import analyze_goals
-from tools.meal_planner import suggest_meal_plan
-from tools.workout_recommender import recommend_workouts
-from tools.tracker import progress_tracker
-from tools.schedule import smart_workout_scheduler
+from context import user_ctx
 from agent import agent as health_and_wellness_agent
 
 
@@ -29,34 +19,30 @@ client = AsyncOpenAI(
 set_tracing_disabled(disabled=True)
 
 async def main():
-
-    session_context = UserSessionContext(
-    name="Ahmed",
-    uid=1,
-    goal=None,
-    diet_preferences=None,
-    workout_plan=None,
-    meal_plan=None,
-    injury_notes=None,
-    handoff_logs=[],
-    progress_logs=[]
-)    
-
+    # Initialize user context
     
+    print("Welcome to Health & Wellness Planner. Type 'exit' to quit.")
+    history = []
 
     while True:
-        user_input = input("Enter your request (or type 'quit' to exit): ").strip()
-        if user_input.lower() == "quit":
-            print("Exiting. Goodbye!")
+        user_input = input("You: ").strip()
+        if user_input.lower() == "exit":
+            print("Goodbye!")
             break
-        elif user_input == "":
-            print("Please enter a request or type 'quit' to exit.")
+        if user_input == "":
+            print("Please enter a request or type 'exit' to quit.")
             continue
-        result = Runner.run_streamed(health_and_wellness_agent, input=user_input, context=session_context)
+
+        history.append({"role": "user", "content": user_input})
+
         try:
-            async for event in result.stream_events():
+            stream = Runner.run_streamed(health_and_wellness_agent, input=history, context=user_ctx)
+            async for event in stream.stream_events():
                 if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
                     print(event.data.delta, end="", flush=True)
+            print()  # newline after streamed response
+            # Optionally update history with assistant's reply if your Runner supports it
+            # history = stream.to_input_list()  # Uncomment if available
         except InputGuardrailTripwireTriggered:
             print("❌ Input rejected by guardrail, please try again with a valid input.")
         except OutputGuardrailTripwireTriggered:
