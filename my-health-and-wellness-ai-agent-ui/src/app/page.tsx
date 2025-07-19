@@ -40,7 +40,7 @@ export default function Home() {
       role: "user",
       timestamp: new Date(),
     }
-
+       
     setMessages((prev) => [...prev, userMessage])
     setQuery("")
     setLoading(true)
