@@ -20,8 +20,6 @@ export default function Home() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const apiUrl = "https://q4-assignments-and-projects.vercel.app/"
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
@@ -40,14 +38,15 @@ export default function Home() {
       role: "user",
       timestamp: new Date(),
     }
-       
+
     setMessages((prev) => [...prev, userMessage])
     setQuery("")
     setLoading(true)
     setCurrentResponse("")
 
     try {
-      const res = await fetch(`${apiUrl}/api/chat`, {
+      // Call the local Next.js API route instead of directly calling FastAPI
+      const res = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -58,7 +57,6 @@ export default function Home() {
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`)
       }
-
       if (!res.body) {
         throw new Error("Response body is null.")
       }
@@ -70,7 +68,6 @@ export default function Home() {
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
-
         const chunk = decoder.decode(value, { stream: true })
         fullResponse += chunk
         setCurrentResponse(fullResponse)
@@ -83,7 +80,6 @@ export default function Home() {
         role: "assistant",
         timestamp: new Date(),
       }
-
       setMessages((prev) => [...prev, assistantMessage])
       setCurrentResponse("")
     } catch (error) {
@@ -163,7 +159,6 @@ export default function Home() {
                   <Bot className="w-4 h-4 text-white" />
                 </div>
               )}
-
               <div className={`max-w-3xl ${message.role === "user" ? "order-1" : ""}`}>
                 <div
                   className={`px-4 py-3 rounded-2xl ${
@@ -178,7 +173,6 @@ export default function Home() {
                   {formatTime(message.timestamp)}
                 </p>
               </div>
-
               {message.role === "user" && (
                 <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1 order-2">
                   <User className="w-4 h-4 text-white" />
@@ -211,7 +205,6 @@ export default function Home() {
               </div>
             </div>
           )}
-
           <div ref={messagesEndRef} />
         </div>
       </div>
