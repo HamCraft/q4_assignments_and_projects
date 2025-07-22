@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 from context import user_ctx
 from agent import agent as health_and_wellness_agent
+from hooks import HealthHooks
 
 
 # Load environment variables from .env file / OpenAI Agents SDK Setup
@@ -36,7 +37,7 @@ async def main():
         history.append({"role": "user", "content": user_input})
 
         try:
-            stream = Runner.run_streamed(health_and_wellness_agent, input=history, context=user_ctx)
+            stream = Runner.run_streamed(health_and_wellness_agent, input=history, context=user_ctx, hooks=HealthHooks())
             async for event in stream.stream_events():
                 if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
                     print(event.data.delta, end="", flush=True)
